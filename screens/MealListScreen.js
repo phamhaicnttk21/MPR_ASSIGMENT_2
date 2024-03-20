@@ -1,35 +1,77 @@
-import React from 'react';
-import { FlatList, TouchableOpacity, Text, View, StyleSheet, Image } from 'react-native';
-import { MEALS } from '../data/dummy-data'; // Make sure this import path is correct
+import React from "react";
+import {
+  FlatList,
+  TouchableOpacity,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+} from "react-native";
+import { MEALS } from "../data/dummy-data"; // Make sure this import path is correct
+import { useState,useEffect } from "react";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import {useNavigation} from '@react-navigation/native-stack';
 
-const MealItem = ({ meal, onSelectMeal }) => {
+const MealItem = ({ meal, onSelectMeal, isFavorite, toggleFavorite }) => {
   return (
-    <TouchableOpacity onPress={() => onSelectMeal(meal)}>
-      <View style={styles.mealItem}>
+    <View style={styles.mealItem}>
+      <TouchableOpacity onPress={() => onSelectMeal(meal)}>
         <Image source={{ uri: meal.imageUrl }} style={styles.mealImage} />
         <View style={styles.mealDetail}>
           <Text style={styles.mealTitle}>{meal.title}</Text>
-          {/* Ensure that categoryIds is an array of strings and is joined into a single string */}
-          <Text style={styles.mealCategory}>{meal.categoryIds.join(', ')}</Text>
+          <TouchableOpacity
+            style={styles.iconContainer}
+            onPress={() => toggleFavorite(meal.id)}
+          >
+            <Icon
+              name={isFavorite ? "favorite" : "favorite-border"}
+              size={24}
+              color="red"
+            />
+          </TouchableOpacity>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
   );
 };
 
-const MealListScreen = ({ route,navigation }) => {
+const MealListScreen = () => {
+  const navigation = useNavigation();
+  const [favorites, setFavorites] = useState([]);
 
-    const catId = route.params.categoryId; // Get the categoryId from route params
-    const displayedMeals = MEALS.filter(meal => meal.categoryIds.indexOf(catId) >= 0);
+  const toggleFavorite = (mealId) => {
+    setFavorites((currentFavorites) => {
+      if (currentFavorites.includes(mealId)) {
+        // Remove from favorites
+        return currentFavorites.filter((id) => id !== mealId);
+      } else {
+        // Add to favorites
+        return [...currentFavorites, mealId];
+      }
+    });
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('FavoriteMealScreen', { favorites })}
+        >
+          <Icon name="favorite" size={24} color="red" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, favorites]);
+
   const renderMealItem = (itemData) => {
     return (
       <MealItem
         meal={itemData.item}
-        onSelectMeal={() => {
-          navigation.navigate('MealDetailsScreen', {
-            mealId: itemData.item.id,
-          });
-        }}
+        onSelectMeal={() =>
+          navigation.navigate("MealDetailsScreen", { mealId: itemData.item.id })
+        }
+        toggleFavorite={() => toggleFavorite(itemData.item.id)}
+        isFavorite={favorites.includes(itemData.item.id)}
       />
     );
   };
@@ -47,15 +89,15 @@ const MealListScreen = ({ route,navigation }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   mealItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 10,
     margin: 10,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   mealImage: {
     width: 70,
@@ -68,11 +110,16 @@ const styles = StyleSheet.create({
   },
   mealTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   mealCategory: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
+  },
+  headerButton: {
+    color: 'red', // Color of your choice
+    paddingHorizontal: 10, // Adjust the padding as needed
+    fontSize: 18, // Adjust font size as needed
   },
 });
 
