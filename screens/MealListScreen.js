@@ -8,9 +8,9 @@ import {
   Image,
 } from "react-native";
 import { MEALS } from "../data/dummy-data"; // Make sure this import path is correct
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import {useNavigation} from '@react-navigation/native-stack';
+import { useNavigation } from "@react-navigation/native";
 
 const MealItem = ({ meal, onSelectMeal, isFavorite, toggleFavorite }) => {
   return (
@@ -26,7 +26,7 @@ const MealItem = ({ meal, onSelectMeal, isFavorite, toggleFavorite }) => {
             <Icon
               name={isFavorite ? "favorite" : "favorite-border"}
               size={24}
-              color="red"
+              color='red'
             />
           </TouchableOpacity>
         </View>
@@ -38,30 +38,37 @@ const MealItem = ({ meal, onSelectMeal, isFavorite, toggleFavorite }) => {
 const MealListScreen = () => {
   const navigation = useNavigation();
   const [favorites, setFavorites] = useState([]);
-
+  const [favoritesArray, setFavoritesArray] = useState([]);
   const toggleFavorite = (mealId) => {
-    setFavorites((currentFavorites) => {
+    setFavoritesArray((currentFavorites) => {
       if (currentFavorites.includes(mealId)) {
-        // Remove from favorites
+        // If the meal is already favorited, remove it from the array
         return currentFavorites.filter((id) => id !== mealId);
       } else {
-        // Add to favorites
+        // If the meal is not favorited, add it to the array
         return [...currentFavorites, mealId];
       }
     });
   };
+  navigation.navigate('FavoriteMealScreen', { favoriteMealIds: favoritesArray });
 
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          onPress={() => navigation.navigate('FavoriteMealScreen', { favorites })}
-        >
+        <TouchableOpacity onPress={() => navigation.navigate('FavoriteMealScreen', { favoriteMealIds: favoritesArray })}>
           <Icon name="favorite" size={24} color="red" />
         </TouchableOpacity>
       ),
     });
-  }, [navigation, favorites]);
+  }, [navigation, favoritesArray]);
+
+  const removeFavorite = (mealId) => {
+    const updatedFavoriteMealIds = favoriteMealIds.filter(id => id !== mealId);
+    setFavoriteMeals(favoriteMeals.filter(meal => meal.id !== mealId));
+    
+    // Update the navigation params to reflect the change
+    navigation.setParams({ favoriteMealIds: updatedFavoriteMealIds });
+  };
 
   const renderMealItem = (itemData) => {
     return (
@@ -117,7 +124,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   headerButton: {
-    color: 'red', // Color of your choice
+    color: "red", // Color of your choice
     paddingHorizontal: 10, // Adjust the padding as needed
     fontSize: 18, // Adjust font size as needed
   },

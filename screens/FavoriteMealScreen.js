@@ -1,45 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, FlatList, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { MEALS } from '../data/dummy-data'; // Ensure this import is correct
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const FavoriteMealScreen = ({ route }) => {
-    const { favorites: favoriteMealIds } = route.params;
-    const [favoriteMeals, setFavoriteMeals] = useState(
-      MEALS.filter((meal) => favoriteMealIds.includes(meal.id))
-    );
-  
-    // Function to remove a meal from favorites
-    const removeFavorite = (mealId) => {
-      setFavoriteMeals((currentFavorites) =>
-        currentFavorites.filter((meal) => meal.id !== mealId)
+  // Get the favorite meal IDs from the navigation parameter
+  const { favoriteMealIds } = route.params;
+
+  // Set up state for the favorite meals
+  const [favoriteMeals, setFavoriteMeals] = useState([]);
+
+  // When the component mounts or favoriteMealIds changes, update favoriteMeals
+  useEffect(() => {
+    if (favoriteMealIds) {
+      const updatedFavoriteMeals = MEALS.filter((meal) => 
+        favoriteMealIds.includes(meal.id)
       );
-    };
+      setFavoriteMeals(updatedFavoriteMeals);
+    }
+  }, [favoriteMealIds]);
 
-  const renderFavoriteItem = ({ item }) => {
-    return (
-      <View style={styles.mealItem}>
-        <Image source={{ uri: item.imageUrl }} style={styles.mealImage} />
-        <View style={styles.mealDetail}>
-          <Text style={styles.mealTitle}>{item.title}</Text>
-          <TouchableOpacity onPress={() => removeFavorite(item.id)} style={styles.iconContainer}>
-            <Icon name="remove-circle" size={24} color="red" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  };
+  // Render each favorite meal item
+  const renderFavoriteItem = ({ item }) => (
+    <View style={styles.mealItem}>
+      <Image source={{ uri: item.imageUrl }} style={styles.mealImage} />
+      <Text style={styles.mealTitle}>{item.title}</Text>
+      {/* Optionally add functionality to remove from favorites */}
+    </View>
+  );
 
+  // Render the flat list of favorite meals
   return (
     <View style={styles.screen}>
       {favoriteMeals.length > 0 ? (
-        <FlatList 
+        <FlatList
           data={favoriteMeals}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={renderFavoriteItem}
+          style={styles.list}
         />
       ) : (
-        <Text>No favorites added yet.</Text>
+        <Text style={styles.noFavoritesText}>No favorites added yet.</Text>
       )}
     </View>
   );
@@ -48,10 +49,11 @@ const FavoriteMealScreen = ({ route }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 10,
     backgroundColor: '#fff',
+  },
+  list: {
+    width: '100%', // Ensure the FlatList takes up the full width
   },
   mealItem: {
     flexDirection: 'row',
@@ -67,19 +69,15 @@ const styles = StyleSheet.create({
     borderRadius: 35,
     marginRight: 10,
   },
-  mealDetail: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   mealTitle: {
     fontSize: 18,
     fontWeight: 'bold',
   },
-  iconContainer: {
-    padding: 5,
+  noFavoritesText: {
+    fontSize: 16,
+    textAlign: 'center',
   },
+  // Add styles for iconContainer if you add remove functionality
 });
 
 export default FavoriteMealScreen;
