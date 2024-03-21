@@ -8,6 +8,7 @@ const itemSize = width / 2; // We divide by 2 since there are 2 columns
 const itemMargin = 10; // Margin between items
 
 const CategoriesScreen = ({ navigation }) => {
+  
   const renderCategoryItem = (itemData) => {
     return (
       <TouchableOpacity

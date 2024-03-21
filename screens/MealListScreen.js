@@ -14,24 +14,25 @@ import { useNavigation } from "@react-navigation/native";
 
 const MealItem = ({ meal, onSelectMeal, isFavorite, toggleFavorite }) => {
   return (
-    <View style={styles.mealItem}>
-      <TouchableOpacity onPress={() => onSelectMeal(meal)}>
-        <Image source={{ uri: meal.imageUrl }} style={styles.mealImage} />
-        <View style={styles.mealDetail}>
-          <Text style={styles.mealTitle}>{meal.title}</Text>
-          <TouchableOpacity
-            style={styles.iconContainer}
-            onPress={() => toggleFavorite(meal.id)}
-          >
-            <Icon
-              name={isFavorite ? "favorite" : "favorite-border"}
-              size={24}
-              color='red'
-            />
-          </TouchableOpacity>
-        </View>
+    <TouchableOpacity style={styles.mealItem} onPress={() => onSelectMeal(meal)}>
+      <Image source={{ uri: meal.imageUrl }} style={styles.mealImage} />
+      <View style={styles.mealDetail}>
+        <Text style={styles.mealTitle}>{meal.title}</Text>
+      </View>
+      <TouchableOpacity
+        style={styles.iconContainer}
+        onPress={(e) => {
+          e.stopPropagation(); // Prevent onPress from firing for the parent TouchableOpacity
+          toggleFavorite(meal.id);
+        }}
+      >
+        <Icon
+          name={isFavorite ? "favorite" : "favorite-border"}
+          size={24}
+          color="red"
+        />
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -50,7 +51,7 @@ const MealListScreen = () => {
       }
     });
   };
-  navigation.navigate('FavoriteMealScreen', { favoriteMealIds: favoritesArray });
+  
 
   useEffect(() => {
     navigation.setOptions({
@@ -61,7 +62,7 @@ const MealListScreen = () => {
       ),
     });
   }, [navigation, favoritesArray]);
-
+    navigation.navigate('FavoriteMealScreen', { favoriteMealIds: favoritesArray });
   const removeFavorite = (mealId) => {
     const updatedFavoriteMealIds = favoriteMealIds.filter(id => id !== mealId);
     setFavoriteMeals(favoriteMeals.filter(meal => meal.id !== mealId));
@@ -100,8 +101,8 @@ const styles = StyleSheet.create({
   },
   mealItem: {
     flexDirection: "row",
-    padding: 10,
-    margin: 10,
+    padding: 50,
+    margin: 5,
     backgroundColor: "#f5f5f5",
     borderRadius: 10,
     alignItems: "center",
