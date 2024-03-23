@@ -1,0 +1,6 @@
+- first, dowload the zip file
+- second, check your node version by using command 
+node -v
+- Next, install packages using command "npm install"
+- finally, open Android Studio and run the command 
+"npm run android"

@@ -14,7 +14,10 @@ import { useNavigation } from "@react-navigation/native";
 
 const MealItem = ({ meal, onSelectMeal, isFavorite, toggleFavorite }) => {
   return (
-    <TouchableOpacity style={styles.mealItem} onPress={() => onSelectMeal(meal)}>
+    <TouchableOpacity
+      style={styles.mealItem}
+      onPress={() => onSelectMeal(meal)}
+    >
       <Image source={{ uri: meal.imageUrl }} style={styles.mealImage} />
       <View style={styles.mealDetail}>
         <Text style={styles.mealTitle}>{meal.title}</Text>
@@ -29,7 +32,7 @@ const MealItem = ({ meal, onSelectMeal, isFavorite, toggleFavorite }) => {
         <Icon
           name={isFavorite ? "favorite" : "favorite-border"}
           size={24}
-          color="red"
+          color='red'
         />
       </TouchableOpacity>
     </TouchableOpacity>
@@ -51,22 +54,31 @@ const MealListScreen = () => {
       }
     });
   };
-  
 
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('FavoriteMealScreen', { favoriteMealIds: favoritesArray })}>
-          <Icon name="favorite" size={24} color="red" />
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("FavoriteMealScreen", {
+              favoriteMealIds: favoritesArray,
+            })
+          }
+        >
+          <Icon name='favorite' size={24} color='red' />
         </TouchableOpacity>
       ),
     });
   }, [navigation, favoritesArray]);
-    navigation.navigate('FavoriteMealScreen', { favoriteMealIds: favoritesArray });
+  navigation.navigate("FavoriteMealScreen", {
+    favoriteMealIds: favoritesArray,
+  });
   const removeFavorite = (mealId) => {
-    const updatedFavoriteMealIds = favoriteMealIds.filter(id => id !== mealId);
-    setFavoriteMeals(favoriteMeals.filter(meal => meal.id !== mealId));
-    
+    const updatedFavoriteMealIds = favoriteMealIds.filter(
+      (id) => id !== mealId
+    );
+    setFavoriteMeals(favoriteMeals.filter((meal) => meal.id !== mealId));
+
     // Update the navigation params to reflect the change
     navigation.setParams({ favoriteMealIds: updatedFavoriteMealIds });
   };

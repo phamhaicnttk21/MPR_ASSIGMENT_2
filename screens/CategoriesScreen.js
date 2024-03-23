@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     justifyContent: 'center',
-    backgroundColor: '#fff', // Background color for the ScrollView
+    backgroundColor: '#A4CE95', // Background color for the ScrollView
   },
   grid: {
     flexDirection: 'row',
